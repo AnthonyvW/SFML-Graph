@@ -19,9 +19,8 @@ int main() {
         data.push_back((std::cos((3.1415f / 25.f) * i) + 1)*50 + (std::cos(3.1415f / 15.f * i)+1) * 50 + 80);
     }
     // Create graph
-    Graph graph = Graph(780, 600, 0, 20);
+    Graph graph = Graph(width, height);
     graph.setData(data);
-    graph.setDataXPad(93);
     graph.setDataCeil(298);
     graph.setDataFloor(100);
     graph.setNumYLabels(20); // 10 labels between beginning and top of maximum data
@@ -31,12 +30,13 @@ int main() {
     graph.setGraphColor(sf::Color(196, 64, 32, 128));
     graph.setXLabelText("Days Passed");
     graph.setYLabelText("Money made per Day");
+    graph.setTitleLabel("This is a Graph");
 
     graph.generateGraph();
 
+    //TODO Add title to graph
 
-
-    bool screenshot = true;
+    bool screenshot = false;
     while (window.isOpen()) {
         Event event;
 

@@ -38,10 +38,12 @@ private:
     sf::Text labels;
     sf::Text xLabel;
     sf::Text yLabel;
+    sf::Text titleLabel;
 
     int numYLabels;
     int xLabelInterval;
     int xPad;
+    int rightXPad;
     int yPad;
 
 public:
@@ -60,6 +62,7 @@ public:
     sf::Text getLabels() { return labels; };
     sf::Text getXLabel() { return xLabel; };
     sf::Text getYLabel() { return yLabel; };
+    sf::Text getTitleLabel() { return titleLabel; };
     float getDataCeil() { return dataCeil; };
     float getDataFloor() { return dataFloor; };
     float getLineThickness() { return FGLineThickness; };
@@ -83,8 +86,10 @@ public:
     void setLabels(sf::Text labelToSet) { labels = labelToSet; };
     void setXLabel(sf::Text labelToSet) { xLabel = labelToSet; };
     void setYLabel(sf::Text labelToSet) { yLabel = labelToSet; };
+    void setTitleLabel(sf::Text labelToSet) { titleLabel = labelToSet; };
     void setXLabelText(std::string text) { xLabel.setString(text); };
     void setYLabelText(std::string text) { yLabel.setString(text); };
+    void setTitleLabel(std::string text) { titleLabel.setString(text); };
     void setDataCeil(float dataRoof) { dataCeil = dataRoof; };
     void setDataFloor(float dataGround) { dataFloor = dataGround; };
     void setNumYLabels(int numLabels) { numYLabels = numLabels; };
