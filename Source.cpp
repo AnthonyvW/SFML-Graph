@@ -16,27 +16,33 @@ int main() {
     // Create Data for graph
     std::vector<float> data;
     for (int i = 0; i < 25; i++) {
-        data.push_back((std::cos((3.1415f / 25.f) * i) + 1)*50 + (std::cos(3.1415f / 15.f * i)+1) * 50 + 80);
+        data.push_back((std::cos((3.1415f / 25.f) * i) + 1)*50 + 80);
+    }
+    std::vector<float> data2;
+    for (int i = 0; i < 25; i++) {
+        data2.push_back((std::sin(3.1415f / 25.f * i + 3.1415f * 1.5f) + 1) * 50 + 80);
     }
     // Create graph
     Graph graph = Graph(width, height);
-    graph.setData(data);
-    graph.setDataCeil(298);
-    graph.setDataFloor(100);
+    graph.setDataCeil(200);
+    graph.setDataFloor(50);
     graph.setNumYLabels(20); // 10 labels between beginning and top of maximum data
-    graph.setXLabelInterval(1); // Show every 2 labels
+    graph.setXLabelInterval(2); // Show every 2 labels
     graph.setFGLineThickness(4);
+    graph.setXLabelText("X Axis Label");
+    graph.setYLabelText("Y Axis Label");
+    graph.setTitleLabel("Graph Title");
+    // 1st Set of Data
+    graph.setGraphLineColor(sf::Color(32, 64, 196));
+    graph.setGraphColor(sf::Color(32, 64, 196, 60));
+    graph.generateGraph(data2);
+    // 2nd Set of Data
     graph.setGraphLineColor(sf::Color(196, 64, 32));
-    graph.setGraphColor(sf::Color(196, 64, 32, 128));
-    graph.setXLabelText("Days Passed");
-    graph.setYLabelText("Money made per Day");
-    graph.setTitleLabel("This is a Graph");
-
-    graph.generateGraph();
-
-    //TODO Add title to graph
-
-    bool screenshot = false;
+    graph.setGraphColor(sf::Color(196, 64, 32, 60));
+    graph.generateGraph(data);
+    
+    
+    bool screenshot = true;
     while (window.isOpen()) {
         Event event;
 
@@ -48,7 +54,6 @@ int main() {
 
         window.clear(sf::Color(255, 255, 255));
         graph.drawGraph(&window);
-
         window.display();
 
         if (screenshot) {

@@ -1,7 +1,6 @@
 #pragma once
 #include "pch.h"
 
-
 class Graph {
 private:
     int width;
@@ -14,7 +13,7 @@ private:
     float FGLineThickness;
 
     // Data Properties
-    std::vector<float> data;
+    //std::vector<float> data;
     float dataCeil;
     float dataFloor;
     float max;
@@ -55,7 +54,7 @@ public:
     // Getters
     sf::VertexArray getGraphLines() { return graphLines; };
     sf::VertexArray getGraph() { return graph; };
-    std::vector<float> getData() { return data; };
+    //std::vector<float> getData() { return data; };
     sf::Color getLineColor() { return lineColor; };
     sf::Color getGraphColor() { return graphColor; };
     sf::Color getGraphLineColor() { return graphLineColor; };
@@ -74,7 +73,7 @@ public:
     int getDataXPad() { return dataXPad; };
 
     // Setters
-    void setData(std::vector<float> dataToSet);
+    //void setData(std::vector<float> dataToSet);
 
     void setLineColor(sf::Color color) { lineColor = color; };
     void setGraphColor(sf::Color color) { graphColor = color; };
@@ -100,9 +99,16 @@ public:
     void setFGLineThickness(float thickness) { FGLineThickness = thickness; };
     void setDataXPad(int xPad) { dataXPad = xPad; };
 
-    // Other Functions
+    // Generates Graph
     float normalizeDataPoint(float lowerBound, float upperBound, float dataLowerBound, float dataUpperBound, float dataPoint);
-    void generateGraph();
+    void setDataMinMax(float dataMin, float dataMax);
+    void findDataMinMax(std::vector<float> data);
+    void generateGraph(std::vector<float> data);
+
+    // Draw Graph
+    void drawGraphLines(sf::RenderWindow* Window);
+    void drawGraphLabels(sf::RenderWindow* Window);
+    void drawGraphChart(sf::RenderWindow* Window);
     void drawGraph(sf::RenderWindow* Window);
 
 };

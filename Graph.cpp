@@ -11,9 +11,11 @@ Graph::Graph() {
     dataFloor = 0;
     dataCeil = height;
     dataStart = 0;
-    dataEnd = 1;
+    dataEnd = -1;
     dataInterval = 1;
     dataXPad = 0;
+    min = -1;
+    max = -1;
     // Graph
     graph.setPrimitiveType(sf::TriangleStrip);
     graphLines.setPrimitiveType(sf::Lines);
@@ -63,9 +65,11 @@ Graph::Graph(int setWidth, int setHeight) {
     dataFloor = 0;
     dataCeil = height;
     dataStart = 0;
-    dataEnd = 1;
+    dataEnd = -1;
     dataInterval = 1;
     dataXPad = 0;
+    min = -1;
+    max = -1;
     // Graph
     graph.setPrimitiveType(sf::TriangleStrip);
     graphLines.setPrimitiveType(sf::Lines);
@@ -115,9 +119,11 @@ Graph::Graph(int setWidth, int setHeight, int setXOffset, int setYOffset) {
     dataFloor = 0;
     dataCeil = height;
     dataStart = 0;
-    dataEnd = 1;
+    dataEnd = -1;
     dataInterval = 1;
     dataXPad = 0;
+    min = -1;
+    max = -1;
     // Graph
     graph.setPrimitiveType(sf::TriangleStrip);
     graphLines.setPrimitiveType(sf::Lines);
@@ -160,6 +166,7 @@ Graph::Graph(int setWidth, int setHeight, int setXOffset, int setYOffset) {
 }
 
 // Setters
+/*
 void Graph::setData(std::vector<float> dataToSet) {
     data = dataToSet;
     dataEnd = data.size();
@@ -171,13 +178,32 @@ void Graph::setData(std::vector<float> dataToSet) {
         }
     }
 }
-
+*/
 // Other Functions
 float Graph::normalizeDataPoint(float lowerBound, float upperBound, float dataLowerBound, float dataUpperBound, float dataPoint) {
     return (upperBound - lowerBound) / (dataUpperBound - dataLowerBound) * (dataPoint - dataUpperBound) + upperBound;
 
 }
-void Graph::generateGraph() {
+void Graph::setDataMinMax(float dataMin, float dataMax) {
+    min = dataMin;
+    max = dataMax;
+}
+void Graph::findDataMinMax(std::vector<float> data) {
+    for (auto& element : data) {
+        if (element > max) {
+            max = element;
+        } else if (element < min) {
+            min = element;
+        }
+    }
+}
+void Graph::generateGraph(std::vector<float> data) {
+    if (dataEnd == -1) {
+        dataEnd = data.size();
+    }
+    if (min == -1 && max == -1) {
+        Graph::findDataMinMax(data);
+    }
     // Set Padding for numbers and labels
     // Setting the padding on the Y Axis
     labels.setString(std::to_string(data.size() * dataInterval));
@@ -188,7 +214,6 @@ void Graph::generateGraph() {
         yPad = labels.getLocalBounds().width + 10 + yOffset;
     } else {
         yPad = labels.getLocalBounds().width + 20 + yOffset + xLabel.getLocalBounds().height;
-
     }
     // Setting the padding on the x Axis
     labels.setString(std::to_string((int)(dataCeil)));
@@ -196,7 +221,6 @@ void Graph::generateGraph() {
         xPad = labels.getLocalBounds().width + 10;
     } else {
         xPad = labels.getLocalBounds().width + 20 + yLabel.getLocalBounds().height;
-
     }
     rightXPad = labels.getLocalBounds().width / 2;
 
@@ -221,6 +245,14 @@ void Graph::generateGraph() {
         graphLines.append(sf::Vertex(sf::Vector2f(xOffset + xPad, height - ((float)(normMax) / (float)(numYLabels)) * i + yOffset), lineColor));
         graphLines.append(sf::Vertex(sf::Vector2f(width + xOffset - rightXPad, height - ((float)(normMax) / (float)(numYLabels)) * i + yOffset), lineColor));
     }
+    // Invisible line at the beginning to allow for multiple lines to be drawn on the same chart.
+    float dataPoint = normalizeDataPoint(0, height, dataFloor, dataCeil, data[0]);
+    graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (0 - dataStart) + xOffset + xPad, height - dataPoint + FGLineThickness / 2 + yOffset), sf::Color(0,0,0,0)));
+    graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (0 - dataStart) + xOffset + xPad, height - dataPoint + FGLineThickness / 2 + yOffset), sf::Color(0, 0, 0, 0)));
+
+    graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (0 - dataStart) + xOffset + xPad, height - dataPoint + yOffset), sf::Color(0, 0, 0, 0)));
+    graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (0 - dataStart) + xOffset + xPad, height + yOffset), sf::Color(0, 0, 0, 0)));
+
     for (int i = dataStart; i < dataEnd; i++) {
         float dataPoint = normalizeDataPoint(0, height, dataFloor, dataCeil, data[i]);
         // Draws the area under the line
@@ -236,22 +268,28 @@ void Graph::generateGraph() {
             graphLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - dataStart - 1)) * (i - dataStart) + xOffset + xPad, yOffset), lineColor));
             graphLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - dataStart - 1)) * (i - dataStart) + xOffset + xPad, height + yOffset), lineColor));
         }
-        
-        
     }
+    // Invisible line at the end to allow for multiple lines to be drawn on the same chart.
+    dataPoint = normalizeDataPoint(0, height, dataFloor, dataCeil, data[dataEnd - 1]);
+    graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (dataEnd - 1 - dataStart) + xOffset + xPad, height - dataPoint - FGLineThickness / 2 + yOffset), sf::Color(0, 0, 0, 0)));
+    graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (dataEnd - 1 - dataStart) + xOffset + xPad, height - dataPoint - FGLineThickness / 2 + yOffset), sf::Color(0, 0, 0, 0)));
+
+    graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (dataEnd - 1 - dataStart) + xOffset + xPad, height - dataPoint + yOffset), sf::Color(0, 0, 0, 0)));
+    graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (dataEnd - 1 - dataStart) + xOffset + xPad, height + yOffset), sf::Color(0, 0, 0, 0)));
+
     //Adjust height and yOffset back to original value
     height += yPad;
     if (titleLabel.getString() != "") {
         yOffset -= titleLabel.getLocalBounds().height + 10;
     }
 }
-void Graph::drawGraph(sf::RenderWindow* Window) {
-    // Draw Graph Plot
-    Window->draw(graph);
+
+
+void Graph::drawGraphLines(sf::RenderWindow* Window) {
     // Draw Background Lines on Plot
     Window->draw(graphLines);
-    // Draw Foreground Lines on Plot
-    Window->draw(graphFGLines);
+}
+void Graph::drawGraphLabels(sf::RenderWindow* Window) {
     // Adjust height and yOffset
     if (titleLabel.getString() != "") {
         yOffset += titleLabel.getLocalBounds().height + 10;
@@ -287,4 +325,16 @@ void Graph::drawGraph(sf::RenderWindow* Window) {
     yLabel.setRotation(270);
     yLabel.setPosition(sf::Vector2f(xOffset, yOffset + (height - yPad) / 2 + yLabel.getLocalBounds().width / 2 + titleLabel.getLocalBounds().height));
     Window->draw(yLabel);
+}
+void Graph::drawGraphChart(sf::RenderWindow* Window) {
+    // Draw Graph Plot
+    Window->draw(graph);
+    // Draw Foreground Lines on Plot
+    Window->draw(graphFGLines);
+}
+
+void Graph::drawGraph(sf::RenderWindow* Window) {
+    Graph::drawGraphLines(Window);
+    Graph::drawGraphChart(Window);
+    Graph::drawGraphLabels(Window);
 }
