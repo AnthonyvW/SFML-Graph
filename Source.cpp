@@ -30,30 +30,38 @@ int main() {
     Graph graph = Graph(width, height);
     graph.setDataCeil(130);
     graph.setDataFloor(0);
-    graph.setNumYLabels(20); // 10 labels between beginning and top of maximum data
+    graph.setNumYLabels(10); // 10 labels between beginning and top of maximum data
     graph.setXLabelInterval(1); // Show every 2 labels
     graph.setFGLineThickness(4);
     graph.setXLabelText("X Axis Label");
     graph.setYLabelText("Y Axis Label");
     graph.setTitleLabel("Graph Title");
+    //graph.setDataXPad(1);
     graph.setXPrefix("Day ");
-    graph.setXSuffix(" EndX");
-    graph.setYPrefix("Test ");
-    graph.setYSuffix(" EndY");
 
+    //graph.setDataStart(0);
+    //graph.setDataEnd(data2.size());
+    graph.setDataMinMax(data);
+    graph.setGraphColor(sf::Color(160, 100, 32, 0));
+    graph.setGraphLineColor(sf::Color(160, 100, 32, 0));
+    graph.generateGraph(data, 0);
 
+    //graph.setDataEnd(30);
     // 4th and 1st set of Data
-    graph.generateAggregateGraph(data2, 5, sf::Color(160, 100, 32, 60), sf::Color(160, 100, 32), data, 0, sf::Color(32, 64, 196, 60), sf::Color(32, 64, 196), 0);
+    graph.generateAggregateGraph(data2, 0, sf::Color(160, 100, 32, 60), sf::Color(160, 100, 32), data, 0, 0);
 
+    graph.setGraphLineColor(sf::Color(32, 100, 160));
+    graph.setGraphColor(sf::Color(32, 100, 160, 128));
+    graph.generateGraph(data, 0);
     // 2nd Set of Data
     graph.setGraphLineColor(sf::Color(196, 64, 32));
     graph.setGraphColor(sf::Color(196, 64, 32, 60));
     graph.generateTrueColorGraph(data2, 0);
 
     // 3rd Set of Data
-    graph.setGraphLineColor(sf::Color(64, 110, 32));
-    graph.setGraphColor(sf::Color(64, 110, 32, 60));
-    graph.generateGraph(data3, 5);
+    //graph.setGraphLineColor(sf::Color(64, 110, 32));
+    //graph.setGraphColor(sf::Color(64, 110, 32, 60));
+    //graph.generateGraph(data3, 5);
     
     bool screenshot = false;
     while (window.isOpen()) {

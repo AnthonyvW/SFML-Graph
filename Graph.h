@@ -119,10 +119,10 @@ public:
 
     // Generates Graph
     float normalizeDataPoint(float lowerBound, float upperBound, float dataLowerBound, float dataUpperBound, float dataPoint);
-    std::vector<float> AggregrateData(std::vector<float> data1, int data1Offset, std::vector<float> data2, int data2Offset);
+    std::vector<float> AggregrateData(std::vector<float> data1, std::vector<float> data2, int range);
     void generateGraph(std::vector<float> data, int graphOffset);
     void generateTrueColorGraph(std::vector<float> data, int graphOffset);
-    void generateAggregateGraph(std::vector<float> data1, int data1Offset, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, int data2Offset, sf::Color data2GraphColor, sf::Color data2GraphLineColor, int graphOffset);
+    void generateAggregateGraph(std::vector<float> data1, int data1Offset, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, int data2Offset, int graphOffset);
     void generateTrueColorAggregateGraph(std::vector<float> data1, int data1Offset, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, int data2Offset, sf::Color data2GraphColor, sf::Color data2GraphLineColor, int graphOffset);
 
     // Draw Graph
