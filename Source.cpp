@@ -36,9 +36,14 @@ int main() {
     graph.setXLabelText("X Axis Label");
     graph.setYLabelText("Y Axis Label");
     graph.setTitleLabel("Graph Title");
+    graph.setXPrefix("Day ");
+    graph.setXSuffix(" EndX");
+    graph.setYPrefix("Test ");
+    graph.setYSuffix(" EndY");
+
 
     // 4th and 1st set of Data
-    graph.generateAggregateGraph(data2, sf::Color(160, 100, 32, 60), sf::Color(160, 100, 32), data, sf::Color(32, 64, 196, 60), sf::Color(32, 64, 196), 0);
+    graph.generateAggregateGraph(data2, 5, sf::Color(160, 100, 32, 60), sf::Color(160, 100, 32), data, 0, sf::Color(32, 64, 196, 60), sf::Color(32, 64, 196), 0);
 
     // 2nd Set of Data
     graph.setGraphLineColor(sf::Color(196, 64, 32));
@@ -50,7 +55,7 @@ int main() {
     graph.setGraphColor(sf::Color(64, 110, 32, 60));
     graph.generateGraph(data3, 5);
     
-    bool screenshot = true;
+    bool screenshot = false;
     while (window.isOpen()) {
         Event event;
 

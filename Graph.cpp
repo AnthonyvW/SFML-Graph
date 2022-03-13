@@ -44,12 +44,16 @@ Graph::Graph() {
     xLabel.setCharacterSize(20);
     xLabel.setString("");
     xLabelInterval = 1;
+    xPrefix = "";
+    xSuffix = "";
     // Y Axis Label
     yLabel.setFont(font);
     yLabel.setFillColor(labelColor);
     yLabel.setCharacterSize(20);
     yLabel.setString("");
     numYLabels = 5;
+    yPrefix = "";
+    ySuffix = "";
     // Title Label
     titleLabel.setFont(font);
     titleLabel.setFillColor(labelColor);
@@ -98,12 +102,16 @@ Graph::Graph(int setWidth, int setHeight) {
     xLabel.setCharacterSize(20);
     xLabel.setString("");
     xLabelInterval = 1;
+    xPrefix = "";
+    xSuffix = "";
     // Y Axis Label
     yLabel.setFont(font);
     yLabel.setFillColor(labelColor);
     yLabel.setCharacterSize(20);
     yLabel.setString("");
     numYLabels = 5;
+    yPrefix = "";
+    ySuffix = "";
     // Title Label
     titleLabel.setFont(font);
     titleLabel.setFillColor(labelColor);
@@ -152,12 +160,16 @@ Graph::Graph(int setWidth, int setHeight, int setXOffset, int setYOffset) {
     xLabel.setCharacterSize(20);
     xLabel.setString("");
     xLabelInterval = 1;
+    xPrefix = "";
+    xSuffix = "";
     // Y Axis Label
     yLabel.setFont(font);
     yLabel.setFillColor(labelColor);
     yLabel.setCharacterSize(20);
     yLabel.setString("");
     numYLabels = 5;
+    yPrefix = "";
+    ySuffix = "";
     // Title Label
     titleLabel.setFont(font);
     titleLabel.setFillColor(labelColor);
@@ -185,7 +197,7 @@ float Graph::normalizeDataPoint(float lowerBound, float upperBound, float dataLo
     return (upperBound - lowerBound) / (dataUpperBound - dataLowerBound) * (dataPoint - dataUpperBound) + upperBound;
 
 }
-std::vector<float> Graph::AggregrateData(std::vector<float> data1, std::vector<float> data2) {
+std::vector<float> Graph::AggregrateData(std::vector<float> data1, int data1Offset, std::vector<float> data2, int data2Offset) {
 
     std::vector<float> output;
 
@@ -216,7 +228,7 @@ void Graph::generateGraph(std::vector<float> data, int graphOffset) {
     }
     // Set Padding for numbers and labels
     // Setting the padding on the Y Axis
-    labels.setString(std::to_string(data.size() * dataInterval));
+    labels.setString(xPrefix + std::to_string(data.size() * dataInterval) + xSuffix);
     if (titleLabel.getString() != "") {
         yOffset += titleLabel.getLocalBounds().height + 10;
     }
@@ -226,13 +238,13 @@ void Graph::generateGraph(std::vector<float> data, int graphOffset) {
         yPad = labels.getLocalBounds().width + 20 + yOffset + xLabel.getLocalBounds().height;
     }
     // Setting the padding on the x Axis
-    labels.setString(std::to_string((int)(dataCeil)));
+    labels.setString(yPrefix + std::to_string((int)(dataCeil)) + ySuffix);
     if (yLabel.getString() == "") {
         xPad = labels.getLocalBounds().width + 10;
     } else {
         xPad = labels.getLocalBounds().width + 20 + yLabel.getLocalBounds().height;
     }
-    rightXPad = labels.getLocalBounds().width / 2;
+    rightXPad = labels.getLocalBounds().height + 5;
 
     // Adjust height to account for padding
     height -= yPad;
@@ -308,21 +320,21 @@ void Graph::generateTrueColorGraph(std::vector<float> data, int graphOffset) {
     graphColor = temp;
     Graph::generateGraph(data, graphOffset);
 }
-void Graph::generateAggregateGraph(std::vector<float> data1, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, sf::Color data2GraphColor, sf::Color data2GraphLineColor, int graphOffset) {
+void Graph::generateAggregateGraph(std::vector<float> data1, int data1Offset, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, int data2Offset, sf::Color data2GraphColor, sf::Color data2GraphLineColor, int graphOffset) {
 
     Graph::setGraphLineColor(data1GraphLineColor);
     Graph::setGraphColor(data1GraphColor);
-    Graph::generateGraph(Graph::AggregrateData(data1, data2), graphOffset);
+    Graph::generateGraph(Graph::AggregrateData(data1, data1Offset, data2, data2Offset), graphOffset);
 
     Graph::setGraphLineColor(data2GraphLineColor);
     Graph::setGraphColor(data2GraphColor);
     Graph::generateGraph(data2, 0);
 }
-void Graph::generateTrueColorAggregateGraph(std::vector<float> data1, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, sf::Color data2GraphColor, sf::Color data2GraphLineColor, int graphOffset) {
+void Graph::generateTrueColorAggregateGraph(std::vector<float> data1, int data1Offset, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, int data2Offset, sf::Color data2GraphColor, sf::Color data2GraphLineColor, int graphOffset) {
 
     Graph::setGraphLineColor(data1GraphLineColor);
     Graph::setGraphColor(data1GraphColor);
-    Graph::generateTrueColorGraph(Graph::AggregrateData(data1, data2), graphOffset);
+    Graph::generateTrueColorGraph(Graph::AggregrateData(data1, data1Offset, data2, data2Offset), graphOffset);
 
     Graph::setGraphLineColor(data2GraphLineColor);
     Graph::setGraphColor(data2GraphColor);
@@ -347,17 +359,19 @@ void Graph::drawGraphLabels(sf::RenderWindow* Window) {
     // Generate Labels on Y Axis
     float normMax = normalizeDataPoint(0, height, dataFloor, dataCeil, max);
     for (int i = 0; height - ((float)(normMax) / (float)(numYLabels)) * i + yOffset > yOffset; i++) {
-        labels.setString(std::to_string((int)((max - dataFloor) / numYLabels * i + dataFloor)));
+        labels.setString(yPrefix + std::to_string((int)((max - dataFloor) / numYLabels * i + dataFloor)) + ySuffix);
         labels.setPosition(xOffset + xPad - labels.getLocalBounds().width - 5, height - ((float)(normMax) / (float)(numYLabels)) * i + yOffset - labels.getLocalBounds().height);
         Window->draw(labels);
     }
     // Generate Labels on X Axis
     for (int i = dataStart; i < dataEnd; i += xLabelInterval) {
-        labels.setString(std::to_string((int)(i)*dataInterval + dataXPad));
-        labels.setRotation(70);
-        labels.setPosition(((float)(width - xPad - rightXPad) / (float)(dataEnd - dataStart - 1)) * (i - dataStart) + xOffset + xPad + (labels.getLocalBounds().width / (2)), yOffset + height);
+        labels.setString(xPrefix + std::to_string((int)(i)*dataInterval + dataXPad) + xSuffix);
+        labels.setOrigin(sf::Vector2f(labels.getLocalBounds().width, labels.getLocalBounds().height));
+        labels.setRotation(-70);
+        labels.setPosition(((float)(width - xPad - rightXPad) / (float)(dataEnd - dataStart - 1)) * (i - dataStart) + xOffset + xPad + 7, yOffset + height + 5);
         Window->draw(labels);
     }
+    labels.setOrigin(sf::Vector2f(0, 0));
     labels.setRotation(0);
     // Adjust height and yOffset back to original values
     height += yPad;

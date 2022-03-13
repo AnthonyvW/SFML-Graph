@@ -36,7 +36,11 @@ private:
     std::string fontStyle;
     sf::Text labels;
     sf::Text xLabel;
+    std::string xPrefix;
+    std::string xSuffix;
     sf::Text yLabel;
+    std::string yPrefix;
+    std::string ySuffix;
     sf::Text titleLabel;
 
     int numYLabels;
@@ -73,6 +77,10 @@ public:
     int getDataInteval() { return dataInterval; };
     int getXLabelInterval() { return xLabelInterval; };
     int getDataXPad() { return dataXPad; };
+    std::string getXPrefix() { return xPrefix; };
+    std::string getXSuffix() { return xSuffix; };
+    std::string getYPrefix() { return yPrefix; };
+    std::string getYSuffix() { return ySuffix; };
 
     // Setters
     //void setData(std::vector<float> dataToSet);
@@ -104,14 +112,18 @@ public:
     void setDataMinMax(std::vector<float> data);
     void setDataMin(float minimum) { min = minimum; };
     void setDataMax(float maximum) { max = maximum; };
+    void setXPrefix(std::string prefix) { xPrefix = prefix; };
+    void setXSuffix(std::string suffix) { xSuffix = suffix; };
+    void setYPrefix(std::string prefix) { yPrefix = prefix; };
+    void setYSuffix(std::string suffix) { ySuffix = suffix; };
 
     // Generates Graph
     float normalizeDataPoint(float lowerBound, float upperBound, float dataLowerBound, float dataUpperBound, float dataPoint);
-    std::vector<float> AggregrateData(std::vector<float> data1, std::vector<float> data2);
+    std::vector<float> AggregrateData(std::vector<float> data1, int data1Offset, std::vector<float> data2, int data2Offset);
     void generateGraph(std::vector<float> data, int graphOffset);
     void generateTrueColorGraph(std::vector<float> data, int graphOffset);
-    void generateAggregateGraph(std::vector<float> data1, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, sf::Color data2GraphColor, sf::Color data2GraphLineColor, int graphOffset);
-    void generateTrueColorAggregateGraph(std::vector<float> data1, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, sf::Color data2GraphColor, sf::Color data2GraphLineColor, int graphOffset);
+    void generateAggregateGraph(std::vector<float> data1, int data1Offset, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, int data2Offset, sf::Color data2GraphColor, sf::Color data2GraphLineColor, int graphOffset);
+    void generateTrueColorAggregateGraph(std::vector<float> data1, int data1Offset, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, int data2Offset, sf::Color data2GraphColor, sf::Color data2GraphLineColor, int graphOffset);
 
     // Draw Graph
     void drawGraphLines(sf::RenderWindow* Window);
