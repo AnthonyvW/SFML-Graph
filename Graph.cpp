@@ -166,10 +166,11 @@ Graph::Graph(int setWidth, int setHeight, int setXOffset, int setYOffset) {
 }
 
 // Setters
-/*
-void Graph::setData(std::vector<float> dataToSet) {
-    data = dataToSet;
-    dataEnd = data.size();
+void Graph::setDataMinMax(float dataMin, float dataMax) {
+    min = dataMin;
+    max = dataMax;
+}
+void Graph::setDataMinMax(std::vector<float> data) {
     for (auto& element : data) {
         if (element > max) {
             max = element;
@@ -178,31 +179,40 @@ void Graph::setData(std::vector<float> dataToSet) {
         }
     }
 }
-*/
+
 // Other Functions
 float Graph::normalizeDataPoint(float lowerBound, float upperBound, float dataLowerBound, float dataUpperBound, float dataPoint) {
     return (upperBound - lowerBound) / (dataUpperBound - dataLowerBound) * (dataPoint - dataUpperBound) + upperBound;
 
 }
-void Graph::setDataMinMax(float dataMin, float dataMax) {
-    min = dataMin;
-    max = dataMax;
-}
-void Graph::findDataMinMax(std::vector<float> data) {
-    for (auto& element : data) {
-        if (element > max) {
-            max = element;
-        } else if (element < min) {
-            min = element;
+std::vector<float> Graph::AggregrateData(std::vector<float> data1, std::vector<float> data2) {
+
+    std::vector<float> output;
+
+    if (data1.size() < data2.size()) {
+        for (int i = 0; i < data1.size(); i++) {
+            output.push_back(data1[i] + data2[i]);
+        }
+        for (int i = 0; i < data2.size() - data1.size(); i++) {
+            output.push_back(data2[i + data1.size() - 1]);
+        }
+    } else {
+        for (int i = 0; i < data2.size(); i++) {
+            output.push_back(data1[i] + data2[i]);
+        }
+        for (int i = 0; i < data1.size() - data2.size(); i++) {
+            output.push_back(data2[i + data2.size() - 1]);
         }
     }
+    return output;
 }
-void Graph::generateGraph(std::vector<float> data) {
+
+void Graph::generateGraph(std::vector<float> data, int graphOffset) {
     if (dataEnd == -1) {
         dataEnd = data.size();
     }
     if (min == -1 && max == -1) {
-        Graph::findDataMinMax(data);
+        Graph::setDataMinMax(data);
     }
     // Set Padding for numbers and labels
     // Setting the padding on the Y Axis
@@ -247,21 +257,21 @@ void Graph::generateGraph(std::vector<float> data) {
     }
     // Invisible line at the beginning to allow for multiple lines to be drawn on the same chart.
     float dataPoint = normalizeDataPoint(0, height, dataFloor, dataCeil, data[0]);
-    graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (0 - dataStart) + xOffset + xPad, height - dataPoint + FGLineThickness / 2 + yOffset), sf::Color(0,0,0,0)));
-    graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (0 - dataStart) + xOffset + xPad, height - dataPoint + FGLineThickness / 2 + yOffset), sf::Color(0, 0, 0, 0)));
+    graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (0 - dataStart + graphOffset) + xOffset + xPad, height - dataPoint + FGLineThickness / 2 + yOffset), sf::Color(0,0,0,0)));
+    graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (0 - dataStart + graphOffset) + xOffset + xPad, height - dataPoint + FGLineThickness / 2 + yOffset), sf::Color(0, 0, 0, 0)));
 
-    graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (0 - dataStart) + xOffset + xPad, height - dataPoint + yOffset), sf::Color(0, 0, 0, 0)));
-    graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (0 - dataStart) + xOffset + xPad, height + yOffset), sf::Color(0, 0, 0, 0)));
+    graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (0 - dataStart + graphOffset) + xOffset + xPad, height - dataPoint + yOffset), sf::Color(0, 0, 0, 0)));
+    graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (0 - dataStart + graphOffset) + xOffset + xPad, height + yOffset), sf::Color(0, 0, 0, 0)));
 
-    for (int i = dataStart; i < dataEnd; i++) {
+    for (int i = dataStart; i < dataEnd && i < data.size(); i++) {
         float dataPoint = normalizeDataPoint(0, height, dataFloor, dataCeil, data[i]);
         // Draws the area under the line
-        graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (i - dataStart) + xOffset + xPad, height - dataPoint + yOffset), graphColor));
-        graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (i - dataStart) + xOffset + xPad, height + yOffset), graphColor));
+        graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (i - dataStart + graphOffset) + xOffset + xPad, height - dataPoint + yOffset), graphColor));
+        graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (i - dataStart + graphOffset) + xOffset + xPad, height + yOffset), graphColor));
         
         // Draws the line
-        graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (i - dataStart) + xOffset + xPad, height - dataPoint + FGLineThickness / 2 + yOffset), graphLineColor));
-        graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (i - dataStart) + xOffset + xPad, height - dataPoint - FGLineThickness / 2 + yOffset), graphLineColor));
+        graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (i - dataStart + graphOffset) + xOffset + xPad, height - dataPoint + FGLineThickness / 2 + yOffset), graphLineColor));
+        graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (i - dataStart + graphOffset) + xOffset + xPad, height - dataPoint - FGLineThickness / 2 + yOffset), graphLineColor));
 
         if (i % xLabelInterval == 0) {
             // Vertical Lines in the background
@@ -270,12 +280,20 @@ void Graph::generateGraph(std::vector<float> data) {
         }
     }
     // Invisible line at the end to allow for multiple lines to be drawn on the same chart.
-    dataPoint = normalizeDataPoint(0, height, dataFloor, dataCeil, data[dataEnd - 1]);
-    graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (dataEnd - 1 - dataStart) + xOffset + xPad, height - dataPoint - FGLineThickness / 2 + yOffset), sf::Color(0, 0, 0, 0)));
-    graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (dataEnd - 1 - dataStart) + xOffset + xPad, height - dataPoint - FGLineThickness / 2 + yOffset), sf::Color(0, 0, 0, 0)));
+    int tempDataEnd;
+    if (dataEnd < data.size()) {
+        dataPoint = normalizeDataPoint(0, height, dataFloor, dataCeil, data[dataEnd - 1]);
+        tempDataEnd = dataEnd - 1;
+    } else {
+        dataPoint = normalizeDataPoint(0, height, dataFloor, dataCeil, data[data.size() - 1]);
+        tempDataEnd = data.size() - 1;
+    }
+    
+    graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (tempDataEnd - dataStart + graphOffset) + xOffset + xPad, height - dataPoint - FGLineThickness / 2 + yOffset), sf::Color(0, 0, 0, 0)));
+    graphFGLines.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (tempDataEnd - dataStart + graphOffset) + xOffset + xPad, height - dataPoint - FGLineThickness / 2 + yOffset), sf::Color(0, 0, 0, 0)));
 
-    graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (dataEnd - 1 - dataStart) + xOffset + xPad, height - dataPoint + yOffset), sf::Color(0, 0, 0, 0)));
-    graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (dataEnd - 1 - dataStart) + xOffset + xPad, height + yOffset), sf::Color(0, 0, 0, 0)));
+    graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (tempDataEnd - dataStart + graphOffset) + xOffset + xPad, height - dataPoint + yOffset), sf::Color(0, 0, 0, 0)));
+    graph.append(sf::Vertex(sf::Vector2f(((float)(width - xPad - rightXPad) / (float)(dataEnd - 1 - dataStart)) * (tempDataEnd - dataStart + graphOffset) + xOffset + xPad, height + yOffset), sf::Color(0, 0, 0, 0)));
 
     //Adjust height and yOffset back to original value
     height += yPad;
@@ -283,11 +301,42 @@ void Graph::generateGraph(std::vector<float> data) {
         yOffset -= titleLabel.getLocalBounds().height + 10;
     }
 }
+void Graph::generateTrueColorGraph(std::vector<float> data, int graphOffset) {
+    sf::Color temp = graphColor;
+    graphColor = sf::Color(255, 255, 255);
+    Graph::generateGraph(data, graphOffset);
+    graphColor = temp;
+    Graph::generateGraph(data, graphOffset);
+}
+void Graph::generateAggregateGraph(std::vector<float> data1, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, sf::Color data2GraphColor, sf::Color data2GraphLineColor, int graphOffset) {
 
+    Graph::setGraphLineColor(data1GraphLineColor);
+    Graph::setGraphColor(data1GraphColor);
+    Graph::generateGraph(Graph::AggregrateData(data1, data2), graphOffset);
 
+    Graph::setGraphLineColor(data2GraphLineColor);
+    Graph::setGraphColor(data2GraphColor);
+    Graph::generateGraph(data2, 0);
+}
+void Graph::generateTrueColorAggregateGraph(std::vector<float> data1, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, sf::Color data2GraphColor, sf::Color data2GraphLineColor, int graphOffset) {
+
+    Graph::setGraphLineColor(data1GraphLineColor);
+    Graph::setGraphColor(data1GraphColor);
+    Graph::generateTrueColorGraph(Graph::AggregrateData(data1, data2), graphOffset);
+
+    Graph::setGraphLineColor(data2GraphLineColor);
+    Graph::setGraphColor(data2GraphColor);
+    Graph::generateTrueColorGraph(data2, 0);
+}
+
+// Rendering
 void Graph::drawGraphLines(sf::RenderWindow* Window) {
     // Draw Background Lines on Plot
     Window->draw(graphLines);
+}
+void Graph::drawGraphFGLines(sf::RenderWindow* Window) {
+    // Draw Foreground Lines on Plot
+    Window->draw(graphFGLines);
 }
 void Graph::drawGraphLabels(sf::RenderWindow* Window) {
     // Adjust height and yOffset
@@ -329,12 +378,11 @@ void Graph::drawGraphLabels(sf::RenderWindow* Window) {
 void Graph::drawGraphChart(sf::RenderWindow* Window) {
     // Draw Graph Plot
     Window->draw(graph);
-    // Draw Foreground Lines on Plot
-    Window->draw(graphFGLines);
 }
 
 void Graph::drawGraph(sf::RenderWindow* Window) {
-    Graph::drawGraphLines(Window);
     Graph::drawGraphChart(Window);
+    Graph::drawGraphLines(Window);
+    Graph::drawGraphFGLines(Window);
     Graph::drawGraphLabels(Window);
 }

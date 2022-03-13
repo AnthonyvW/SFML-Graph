@@ -65,6 +65,8 @@ public:
     float getDataCeil() { return dataCeil; };
     float getDataFloor() { return dataFloor; };
     float getLineThickness() { return FGLineThickness; };
+    float getDataMin() { return min; };
+    float getDataMax() { return max; };
     int getNumYLabels() { return numYLabels; };
     int getDataStart() { return dataStart; };
     int getDataEnd() { return dataEnd; };
@@ -98,15 +100,22 @@ public:
     void setDataInterval(int interval) { dataInterval = interval; };
     void setFGLineThickness(float thickness) { FGLineThickness = thickness; };
     void setDataXPad(int xPad) { dataXPad = xPad; };
+    void setDataMinMax(float dataMin, float dataMax);
+    void setDataMinMax(std::vector<float> data);
+    void setDataMin(float minimum) { min = minimum; };
+    void setDataMax(float maximum) { max = maximum; };
 
     // Generates Graph
     float normalizeDataPoint(float lowerBound, float upperBound, float dataLowerBound, float dataUpperBound, float dataPoint);
-    void setDataMinMax(float dataMin, float dataMax);
-    void findDataMinMax(std::vector<float> data);
-    void generateGraph(std::vector<float> data);
+    std::vector<float> AggregrateData(std::vector<float> data1, std::vector<float> data2);
+    void generateGraph(std::vector<float> data, int graphOffset);
+    void generateTrueColorGraph(std::vector<float> data, int graphOffset);
+    void generateAggregateGraph(std::vector<float> data1, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, sf::Color data2GraphColor, sf::Color data2GraphLineColor, int graphOffset);
+    void generateTrueColorAggregateGraph(std::vector<float> data1, sf::Color data1GraphColor, sf::Color data1GraphLineColor, std::vector<float> data2, sf::Color data2GraphColor, sf::Color data2GraphLineColor, int graphOffset);
 
     // Draw Graph
     void drawGraphLines(sf::RenderWindow* Window);
+    void drawGraphFGLines(sf::RenderWindow* Window);
     void drawGraphLabels(sf::RenderWindow* Window);
     void drawGraphChart(sf::RenderWindow* Window);
     void drawGraph(sf::RenderWindow* Window);
